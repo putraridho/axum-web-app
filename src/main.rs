@@ -1,21 +1,25 @@
-use std::net::SocketAddr;
-
-use axum::{middleware, Router};
-use error::Result;
-use model::ModelManager;
-use tower_cookies::CookieManagerLayer;
-use tracing::info;
-use tracing_subscriber::EnvFilter;
-use web::{
-	mw_auth::mw_ctx_resolve, mw_res_map::mw_response_map, routes_login,
-	routes_static,
-};
-
+mod config;
 mod ctx;
 mod error;
 mod log;
 mod model;
 mod web;
+
+pub use self::error::{Error, Result};
+pub use config::config;
+
+use crate::{
+	model::ModelManager,
+	web::{
+		mw_auth::mw_ctx_resolve, mw_res_map::mw_response_map, routes_login,
+		routes_static,
+	},
+};
+use axum::{middleware, Router};
+use std::net::SocketAddr;
+use tower_cookies::CookieManagerLayer;
+use tracing::info;
+use tracing_subscriber::EnvFilter;
 
 #[tokio::main]
 async fn main() -> Result<()> {

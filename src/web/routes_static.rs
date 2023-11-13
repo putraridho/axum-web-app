@@ -5,7 +5,7 @@ use axum::{
 };
 use tower_http::services::ServeDir;
 
-const WEB_FOLDER: &str = "web-folder";
+use crate::config;
 
 pub fn serve_dir() -> MethodRouter {
 	async fn handle_404() -> (StatusCode, &'static str) {
@@ -13,6 +13,7 @@ pub fn serve_dir() -> MethodRouter {
 	}
 
 	any_service(
-		ServeDir::new(WEB_FOLDER).not_found_service(handle_404.into_service()),
+		ServeDir::new(&config().WEB_FOLDER)
+			.not_found_service(handle_404.into_service()),
 	)
 }
