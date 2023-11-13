@@ -1,22 +1,14 @@
-use crate::model;
+use serde::Serialize;
 
 pub type Result<T> = core::result::Result<T, Error>;
 
-#[derive(Debug)]
-pub enum Error {
-	Model(model::Error),
-}
-
-impl From<model::Error> for Error {
-	fn from(val: model::Error) -> Self {
-		Self::Model(val)
-	}
-}
+#[derive(Debug, Serialize)]
+pub enum Error {}
 
 impl core::fmt::Display for Error {
 	fn fmt(
 		&self,
-		fmt: &mut core::fmt::Formatter,
+		fmt: &mut std::fmt::Formatter<'_>,
 	) -> core::result::Result<(), core::fmt::Error> {
 		write!(fmt, "{self:?}")
 	}
