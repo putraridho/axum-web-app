@@ -4,6 +4,8 @@ use axum::{middleware, Router};
 use error::Result;
 use model::ModelManager;
 use tower_cookies::CookieManagerLayer;
+use tracing::info;
+use tracing_subscriber::EnvFilter;
 use web::{
 	mw_auth::mw_ctx_resolve, mw_res_map::mw_response_map, routes_login,
 	routes_static,
@@ -17,6 +19,12 @@ mod web;
 
 #[tokio::main]
 async fn main() -> Result<()> {
+	tracing_subscriber::fmt()
+		.without_time()
+		.with_target(false)
+		.with_env_filter(EnvFilter::from_default_env())
+		.init();
+
 	// Initialize ModelManager.
 	let mm = ModelManager::new().await?;
 
@@ -32,7 +40,7 @@ async fn main() -> Result<()> {
 		.fallback_service(routes_static::serve_dir());
 
 	let addr = SocketAddr::from(([127, 0, 0, 1], 8080));
-	println!("->> {:<12} - {addr}\n", "LISTENING");
+	info!("{:<12} - {addr}\n", "LISTENING");
 	axum::Server::bind(&addr)
 		.serve(routes_all.into_make_service())
 		.await
