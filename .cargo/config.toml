@@ -18,6 +18,11 @@ RUST_LOG="axum_web_app=debug"
 
 SERVICE_DB_URL="postgres://app_user:dev_only_pwd@localhost/app_db"
 
+SERVICE_PWD_KEY="WMVK1LV1IeEmnM7nL0RnWCPEAvYv1m85WbWbX70nOcvt8Qh3FlH_TuWvvlYZGfv7AjpUHIlTEcCwfIh8MJPxnQ"
+
+SERVICE_TOKEN_KEY="r2gzgvWog9o2kMg5b0cbYLLhJ0TPKf1qWVphRJ8EG8EsH3L11o5DjOpkWlOX4FHLbUSTX8S9Qvlm6YOpgAm-hg"
+SERVICE_TOKEN_DURATION_SEC="1800" # 30 minutes
+
 ## -- ConfigMap
 
 # This will be relative to Cargo.toml
