@@ -6,7 +6,7 @@ use uuid::Uuid;
 use crate::{
 	crypt::{pwd, EncryptContent},
 	ctx::Ctx,
-	model::{base, Error, ModelManager, Result},
+	model::{base, ModelManager, Result},
 };
 
 use super::base::DbBmc;
