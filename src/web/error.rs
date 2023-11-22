@@ -1,4 +1,4 @@
-use crate::{model, web};
+use crate::{crypt, model, web};
 use axum::{
 	http::StatusCode,
 	response::{IntoResponse, Response},
@@ -21,11 +21,18 @@ pub enum Error {
 
 	// -- Modules
 	Model(model::Error),
+	Crypt(crypt::Error),
 }
 
 impl From<model::Error> for Error {
 	fn from(val: model::Error) -> Self {
 		Self::Model(val)
+	}
+}
+
+impl From<crypt::Error> for Error {
+	fn from(val: crypt::Error) -> Self {
+		Self::Crypt(val)
 	}
 }
 
