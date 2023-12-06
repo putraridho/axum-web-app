@@ -1,10 +1,10 @@
 use crate::{
-	crypt::{pwd, EncryptContent},
 	ctx::Ctx,
 	model::{
 		user::{UserBmc, UserForLogin},
 		ModelManager,
 	},
+	pwd::{self, ContentToHash},
 	web::{self, remove_token_cookie, Error, Result},
 };
 use axum::{extract::State, routing::post, Json, Router};
@@ -46,8 +46,8 @@ async fn api_login_handler(
 	};
 
 	pwd::validate_pwd(
-		&EncryptContent {
-			salt: user.pwd_salt.to_string(),
+		&ContentToHash {
+			salt: user.pwd_salt,
 			content: pwd_clear.clone(),
 		},
 		&user_pwd,
@@ -55,7 +55,7 @@ async fn api_login_handler(
 	.map_err(|_| Error::LoginFailPwdNotMatching { user_id })?;
 
 	// -- Set the web token.
-	web::set_token_cookie(&cookies, &user.username, &user.token_salt.to_string())?;
+	web::set_token_cookie(&cookies, &user.username, user.token_salt)?;
 
 	// -- Create the success body.
 	let body = Json(json!({

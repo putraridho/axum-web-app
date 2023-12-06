@@ -4,9 +4,9 @@ use sqlx::{postgres::PgRow, FromRow};
 use uuid::Uuid;
 
 use crate::{
-	crypt::{pwd, EncryptContent},
 	ctx::Ctx,
 	model::{base, ModelManager, Result},
+	pwd::{self, ContentToHash},
 };
 
 use super::base::DbBmc;
@@ -93,9 +93,9 @@ impl UserBmc {
 
 		let user: UserForLogin = Self::get(ctx, mm, id).await?;
 
-		let pwd = pwd::encrypt_pwd(&EncryptContent {
+		let pwd = pwd::hash_pwd(&ContentToHash {
 			content: pwd_clear.to_string(),
-			salt: user.pwd_salt.to_string(),
+			salt: user.pwd_salt,
 		})?;
 
 		sqlb::update()

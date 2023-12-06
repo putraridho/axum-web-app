@@ -1,18 +1,9 @@
-use derive_more::From;
-
-use crate::model;
-
 pub type Result<T> = core::result::Result<T, Error>;
 
-#[derive(Debug, From)]
+#[derive(Debug)]
 pub enum Error {
-	// Config
-	ConfigMissingEnv(&'static str),
-	ConfigWrongFormat(&'static str),
-
-	// -- Modules
-	#[from]
-	Model(model::Error),
+	MissingEnv(&'static str),
+	WrongFormat(&'static str),
 }
 
 impl core::fmt::Display for Error {

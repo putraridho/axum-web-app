@@ -1,12 +1,13 @@
+use serde::Serialize;
+
 pub type Result<T> = core::result::Result<T, Error>;
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub enum Error {
-	// Time
-	DateFailParse(String),
+	KeyFail,
 
-	// Base64
-	FailToB64uDecode,
+	// -- Pwd
+	NotMatching,
 }
 
 impl core::fmt::Display for Error {

@@ -1,10 +1,10 @@
 use crate::{
-	crypt::token::{validate_web_token, Token},
 	ctx::Ctx,
 	model::{
 		user::{UserBmc, UserForAuth},
 		ModelManager,
 	},
+	token::{validate_web_token, Token},
 	web::{set_token_cookie, Error, Result},
 };
 use async_trait::async_trait;
@@ -74,11 +74,11 @@ async fn _ctx_resolve(mm: State<ModelManager>, cookies: &Cookies) -> CtxExtResul
 			.ok_or(CtxExtError::UserNotFound)?;
 
 	// -- Validate Token
-	validate_web_token(&token, &user.token_salt.to_string())
+	validate_web_token(&token, user.token_salt)
 		.map_err(|_| CtxExtError::FailValidate)?;
 
 	// -- Update Token
-	set_token_cookie(cookies, &user.username, &user.token_salt.to_string())
+	set_token_cookie(cookies, &user.username, user.token_salt)
 		.map_err(|_| CtxExtError::CannotSetTokenCookie)?;
 
 	// -- Create CtxExtResult

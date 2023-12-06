@@ -17,8 +17,12 @@ use crate::{
 	},
 };
 
+use params::*;
+
+mod params;
 mod task_rpc;
 
+/// RPC basic information holding the id and method for further logging.
 #[derive(Deserialize)]
 struct RpcRequest {
 	id: Option<Value>,
@@ -26,20 +30,12 @@ struct RpcRequest {
 	params: Option<Value>,
 }
 
-#[derive(Deserialize)]
-pub struct ParamsForCreate<D> {
-	data: D,
-}
-
-#[derive(Deserialize)]
-pub struct ParamsForUpdate<D> {
-	id: i64,
-	data: D,
-}
-
-#[derive(Deserialize)]
-pub struct ParamsIded {
-	id: i64,
+/// RPC basic information containing the rpc request
+/// id and method for additional logging purposes.
+#[derive(Debug)]
+pub struct RpcInfo {
+	pub id: Option<Value>,
+	pub method: String,
 }
 
 pub fn routes(mm: ModelManager) -> Router {
@@ -53,6 +49,7 @@ async fn rpc_handler(
 	ctx: Ctx,
 	Json(rpc_req): Json<RpcRequest>,
 ) -> Response {
+	// -- Create the RPC Info to be set to the response.extensions.
 	let rpc_info = RpcInfo {
 		id: rpc_req.id.clone(),
 		method: rpc_req.method.clone(),
@@ -65,15 +62,8 @@ async fn rpc_handler(
 	res
 }
 
-/// RPC basic information holding the id and method for further logging.
-#[derive(Debug)]
-pub struct RpcInfo {
-	pub id: Option<Value>,
-	pub method: String,
-}
-
 macro_rules! exec_rpc_fn {
-	// -- With params
+	// With Params
 	($rpc_fn:expr, $ctx:expr, $mm:expr, $rpc_params:expr) => {{
 		let rpc_fn_name = stringify!($rpc_fn);
 		let params = $rpc_params.ok_or(Error::RpcMissingParams {
@@ -85,7 +75,7 @@ macro_rules! exec_rpc_fn {
 		$rpc_fn($ctx, $mm, params).await.map(to_value)??
 	}};
 
-	// -- Without params
+	// Without Params
 	($rpc_fn:expr, $ctx:expr, $mm:expr) => {
 		$rpc_fn($ctx, $mm).await.map(to_value)??
 	};
@@ -110,6 +100,7 @@ async fn _rpc_handler(
 		"list_tasks" => exec_rpc_fn!(list_tasks, ctx, mm),
 		"update_task" => exec_rpc_fn!(update_task, ctx, mm, rpc_params),
 		"delete_task" => exec_rpc_fn!(delete_task, ctx, mm, rpc_params),
+
 		// -- Fallback as Err.
 		_ => return Err(Error::RpcMethodUnknown(rpc_method)),
 	};
