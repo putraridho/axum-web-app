@@ -1,7 +1,9 @@
 use crate::{
 	config,
 	crypt::{encrypt_into_b64u, EncryptContent, Error, Result},
-	utils::{b64u_decode, b64u_encode, now_utc, now_utc_plus_sec_str, parse_utc},
+	utils::{
+		b64u_decode_to_string, b64u_encode, now_utc, now_utc_plus_sec_str, parse_utc,
+	},
 };
 
 /// String format: `ident_b64u.exp_b64u.sign_b64u`
@@ -24,9 +26,10 @@ impl std::str::FromStr for Token {
 		let (ident_b64u, exp_b64u, sign_b64u) = (splits[0], splits[1], splits[2]);
 
 		Ok(Self {
-			ident: (b64u_decode(ident_b64u)
+			ident: (b64u_decode_to_string(ident_b64u)
 				.map_err(|_| Error::TokenCannotDecodeIdent))?,
-			exp: b64u_decode(exp_b64u).map_err(|_| Error::TokenCannotDecodeIdent)?,
+			exp: b64u_decode_to_string(exp_b64u)
+				.map_err(|_| Error::TokenCannotDecodeIdent)?,
 			sign_b64u: sign_b64u.to_string(),
 		})
 	}
