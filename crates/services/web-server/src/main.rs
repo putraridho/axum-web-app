@@ -8,7 +8,7 @@ mod log;
 mod web;
 
 pub use self::error::{Error, Result};
-use config::web_config;
+
 
 use crate::web::{
 	mw_auth::{mw_ctx_require, mw_ctx_resolve},

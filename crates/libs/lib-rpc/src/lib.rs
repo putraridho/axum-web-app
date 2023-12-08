@@ -8,7 +8,7 @@ mod params;
 mod task_rpc;
 
 pub use self::error::{Error, Result};
-use params::*;
+
 
 /// RPC basic information holding the id and method for further logging.
 #[derive(Deserialize)]
