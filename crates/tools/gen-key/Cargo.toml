@@ -1,0 +1,14 @@
+[package]
+name = "gen-key"
+version = "0.1.0"
+edition = "2021"
+
+[lints]
+workspace = true
+
+[dependencies]
+# -- App Crates
+lib-utils = { path = "../../libs/lib-utils" }
+# -- Other
+anyhow = "1"
+rand = "0.8" # For examples/gen-key
