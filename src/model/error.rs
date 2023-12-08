@@ -15,6 +15,10 @@ pub enum Error {
 		entity: &'static str,
 		id: i64,
 	},
+	ListLimitOverMax {
+		max: i64,
+		actual: i64,
+	},
 
 	// Modules
 	#[from]
@@ -25,6 +29,10 @@ pub enum Error {
 	// Externals
 	#[from]
 	Sqlx(#[serde_as(as = "DisplayFromStr")] sqlx::Error),
+	#[from]
+	SeaQuery(#[serde_as(as = "DisplayFromStr")] sea_query::error::Error),
+	#[from]
+	ModqlIntoSea(#[serde_as(as = "DisplayFromStr")] modql::filter::IntoSeaError),
 }
 
 impl core::fmt::Display for Error {
