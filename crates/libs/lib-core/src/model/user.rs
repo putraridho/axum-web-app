@@ -109,10 +109,11 @@ impl UserBmc {
 
 		// -- Prep password
 		let user: UserForLogin = Self::get(ctx, mm, id).await?;
-		let pwd = pwd::hash_pwd(&ContentToHash {
+		let pwd = pwd::hash_pwd(ContentToHash {
 			content: pwd_clear.to_string(),
 			salt: user.pwd_salt,
-		})?;
+		})
+		.await?;
 
 		// -- Build query
 		let mut query = Query::update();

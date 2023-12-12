@@ -1,4 +1,4 @@
-#![allow(unused)] // For beginning only.
+#![allow(unused)]
 
 use anyhow::Result;
 use serde_json::json;
@@ -23,17 +23,17 @@ async fn main() -> Result<()> {
 		let req_create_task = hc.do_post(
 			"/api/rpc",
 			json!({
-				"id": i,
+				"id": 1,
 				"method": "create_task",
 				"params": {
 					"data": {
-						"title": format!("Task AAA {i}")
+						"title": format!("task AAA {i}")
 					}
 				}
 			}),
 		);
 		let result = req_create_task.await?;
-		task_ids.push(result.json_value::<i64>("/result/id")?)
+		task_ids.push(result.json_value::<i64>("/result/id")?);
 	}
 
 	let req_update_task = hc.do_post(
@@ -44,7 +44,7 @@ async fn main() -> Result<()> {
 			"params": {
 				"id": task_ids[0],
 				"data": {
-					"title": "Task BBB"
+					"title": "task BB"
 				}
 			}
 		}),
@@ -57,7 +57,7 @@ async fn main() -> Result<()> {
 			"id": 1,
 			"method": "delete_task",
 			"params": {
-				"id": task_ids[1],
+				"id": task_ids[1]
 			}
 		}),
 	);
@@ -70,11 +70,10 @@ async fn main() -> Result<()> {
 			"method": "list_tasks",
 			"params": {
 				"filters": [{
-					"title": {
-						"$endsWith": "BB"
-					}
-				}, {
-					"id": { "$in": [task_ids[2], task_ids[3] ]}
+					"title": {"$endsWith": "BB"},
+					"done": false,
+				},{
+					"id": {"$in": [task_ids[2], task_ids[3]]}
 				}],
 				"list_options": {
 					"order_bys": "!id"

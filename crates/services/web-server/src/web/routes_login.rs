@@ -1,6 +1,5 @@
-use crate::web::{self, remove_token_cookie, Error, Result};
 use axum::{extract::State, routing::post, Json, Router};
-use lib_auth::pwd::{self, ContentToHash};
+use lib_auth::pwd::{self, ContentToHash, SchemeStatus};
 use lib_core::{
 	ctx::Ctx,
 	model::{
@@ -12,6 +11,10 @@ use serde::Deserialize;
 use serde_json::{json, Value};
 use tower_cookies::Cookies;
 use tracing::debug;
+
+use crate::web::{self, remove_token_cookie};
+
+use super::{Error, Result};
 
 pub fn routes(mm: ModelManager) -> Router {
 	Router::new()
@@ -26,7 +29,7 @@ async fn api_login_handler(
 	cookies: Cookies,
 	Json(payload): Json<LoginPayload>,
 ) -> Result<Json<Value>> {
-	debug!(" {:<12} - api_login_handler", "HANDLER");
+	debug!("{:<12} - api_login_handler", "HANDLER");
 
 	let LoginPayload {
 		username,
@@ -45,23 +48,28 @@ async fn api_login_handler(
 		return Err(Error::LoginFailUserHasNoPwd { user_id });
 	};
 
-	pwd::validate_pwd(
-		&ContentToHash {
+	let scheme_status = pwd::validate_pwd(
+		ContentToHash {
 			salt: user.pwd_salt,
 			content: pwd_clear.clone(),
 		},
-		&user_pwd,
+		user_pwd,
 	)
+	.await
 	.map_err(|_| Error::LoginFailPwdNotMatching { user_id })?;
 
-	// -- Set the web token.
+	if let SchemeStatus::Outdated = scheme_status {
+		debug!("pwd encrypt scheme outdated, upgrading.");
+		UserBmc::update_pwd(&root_ctx, &mm, user.id, &pwd_clear).await?;
+	}
+
 	web::set_token_cookie(&cookies, &user.username, user.token_salt)?;
 
 	// -- Create the success body.
 	let body = Json(json!({
-	  "result": {
-		"success": true
-	  }
+		"result": {
+			"success": true
+		}
 	}));
 	Ok(body)
 }

@@ -22,7 +22,7 @@ pub async fn mw_response_map(
 ) -> Response {
 	let ctx = ctx.map(|ctx| ctx.0);
 
-	debug!(" {:<12} - mw_response_map", "RES_MAPPER");
+	debug!("{:<12} - mw_response_map", "RES_MAPPER");
 	let uuid = Uuid::new_v4();
 
 	let rpc_info = res.extensions().get::<Arc<RpcInfo>>().map(Arc::as_ref);

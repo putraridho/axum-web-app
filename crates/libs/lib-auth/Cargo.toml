@@ -3,12 +3,17 @@ name = "lib-auth"
 version = "0.1.0"
 edition = "2021"
 
+[lib]
+doctest = false
+
 [lints]
 workspace = true
 
 [dependencies]
 # -- App Libs
 lib-utils = { path = "../../libs/lib-utils" }
+# -- Async
+tokio = { version = "1", features = ["full"] }
 # -- Json
 serde = { version = "1", features = ["derive"] }
 # -- Hashing (pwd scheme-01 & Token)
@@ -19,6 +24,8 @@ argon2 = { version = "0.5.2", features = ["std"] }
 # -- Others
 uuid = { version = "1", features = ["v4", "fast-rng"] }
 lazy-regex = "3.1.0"
+derive_more = { version = "1.0.0-beta", features = ["from"] }
+enum_dispatch = "0.3"
 
 [dev-dependencies]
 anyhow = "1"
