@@ -1,43 +1,47 @@
-use std::time::{SystemTime, UNIX_EPOCH};
-
 use axum::http::{Method, Uri};
 use lib_core::ctx::Ctx;
+use lib_utils::time::{format_time, now_utc};
 use serde::Serialize;
 use serde_json::{json, Value};
 use serde_with::skip_serializing_none;
+use time::Duration;
 use tracing::debug;
-use uuid::Uuid;
 
 use crate::{
-	web::{self, routes_rpc::RpcInfo},
+	web::{self, mw_stamp::ReqStamp, routes_rpc::RpcInfo},
 	Result,
 };
 
 pub async fn log_request(
-	uuid: Uuid,
-	req_method: Method,
+	http_method: Method,
 	uri: Uri,
+	req_stamp: ReqStamp,
 	rpc_info: Option<&RpcInfo>,
 	ctx: Option<Ctx>,
 	web_error: Option<&web::Error>,
 	client_error: Option<web::ClientError>,
 ) -> Result<()> {
-	let timestamp = SystemTime::now()
-		.duration_since(UNIX_EPOCH)
-		.unwrap()
-		.as_millis();
-
+	// -- Prep error
 	let error_type = web_error.map(|se| se.as_ref().to_string());
 	let error_data = serde_json::to_value(web_error)
 		.ok()
 		.and_then(|mut v| v.get_mut("data").map(|v| v.take()));
 
+	// -- Prep Req Information
+	let ReqStamp { uuid, time_in } = req_stamp;
+	let now = now_utc();
+	let duration: Duration = now - time_in;
+
+	let duration_ms = (duration.as_seconds_f64() * 1_000_000.).floor() / 1_000.;
+
 	// Create the RequestLogLine
 	let log_line = RequestLogLine {
 		uuid: uuid.to_string(),
-		timestamp: timestamp.to_string(),
+		timestamp: format_time(now),
+		time_in: format_time(time_in),
+		duration_ms,
 		http_path: uri.to_string(),
-		http_method: req_method.to_string(),
+		http_method: http_method.to_string(),
 		rpc_id: rpc_info.and_then(|rpc| rpc.id.as_ref().map(|id| id.to_string())),
 		rpc_method: rpc_info.map(|rpc| rpc.method.to_string()),
 		user_id: ctx.map(|c| c.user_id()),
@@ -57,7 +61,9 @@ pub async fn log_request(
 #[derive(Serialize)]
 struct RequestLogLine {
 	uuid: String,      // uuid string formatted
-	timestamp: String, // (should be iso(8601)
+	timestamp: String, // (Rfc3339)
+	time_in: String,   // (Rfc3339)
+	duration_ms: f64,
 
 	// -- User and cont,ClientErrorext attributes.
 	user_id: Option<i64>,

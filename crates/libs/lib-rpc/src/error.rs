@@ -9,13 +9,11 @@ pub type Result<T> = core::result::Result<T, Error>;
 #[derive(Debug, Serialize, From)]
 #[serde(tag = "type", content = "data")]
 pub enum Error {
+	MissingCtx,
+
+	// -- RPC Router
 	RpcMethodUnknown(String),
-	RpcMissingParams {
-		rpc_method: String,
-	},
-	RpcFailJsonParams {
-		rpc_method: String,
-	},
+	RpcIntoParamsMissing,
 
 	// -- Modules
 	#[from]

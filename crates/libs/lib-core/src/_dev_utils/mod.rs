@@ -5,6 +5,7 @@ use crate::{
 	ctx::Ctx,
 	model::{
 		self,
+		project::{ProjectBmc, ProjectForCreate},
 		task::{Task, TaskBmc, TaskForCreate},
 		ModelManager,
 	},
@@ -38,9 +39,25 @@ pub async fn init_test() -> ModelManager {
 	mm.clone()
 }
 
+pub async fn seed_project(
+	ctx: &Ctx,
+	mm: &ModelManager,
+	name: &str,
+) -> model::Result<i64> {
+	ProjectBmc::create(
+		ctx,
+		mm,
+		ProjectForCreate {
+			name: name.to_string(),
+		},
+	)
+	.await
+}
+
 pub async fn seed_tasks(
 	ctx: &Ctx,
 	mm: &ModelManager,
+	project_id: i64,
 	titles: &[&str],
 ) -> model::Result<Vec<Task>> {
 	let mut tasks = Vec::new();
@@ -50,6 +67,7 @@ pub async fn seed_tasks(
 			ctx,
 			mm,
 			TaskForCreate {
+				project_id,
 				title: title.to_string(),
 			},
 		)

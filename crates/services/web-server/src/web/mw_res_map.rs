@@ -14,10 +14,13 @@ use crate::{
 	web::{self, mw_auth::CtxW, routes_rpc::RpcInfo},
 };
 
+use super::mw_stamp::ReqStamp;
+
 pub async fn mw_response_map(
 	ctx: Option<CtxW>,
 	uri: Uri,
 	req_method: Method,
+	req_stamp: ReqStamp,
 	res: Response,
 ) -> Response {
 	let ctx = ctx.map(|ctx| ctx.0);
@@ -28,7 +31,7 @@ pub async fn mw_response_map(
 	let rpc_info = res.extensions().get::<Arc<RpcInfo>>().map(Arc::as_ref);
 
 	// -- Get the eventual response error.
-	let web_error = res.extensions().get::<web::Error>();
+	let web_error = res.extensions().get::<Arc<web::Error>>().map(Arc::as_ref);
 	let client_status_error = web_error.map(|se| se.client_status_and_error());
 
 	// -- If client error, build the new response.
@@ -60,9 +63,9 @@ pub async fn mw_response_map(
 	// Build and log the server log line.
 	let client_error = client_status_error.unzip().1;
 	let _ = log_request(
-		uuid,
 		req_method,
 		uri,
+		req_stamp,
 		rpc_info,
 		ctx,
 		web_error,

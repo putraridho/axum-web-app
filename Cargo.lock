@@ -1228,7 +1228,9 @@ name = "lib-core"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "async-trait",
  "derive_more",
+ "enum_dispatch",
  "httpc-test",
  "lib-auth",
  "lib-utils",
@@ -1240,6 +1242,8 @@ dependencies = [
  "serde_with",
  "serial_test",
  "sqlx",
+ "strum_macros",
+ "time",
  "tokio",
  "tracing",
  "tracing-subscriber",
@@ -1251,6 +1255,7 @@ name = "lib-rpc"
 version = "0.1.0"
 dependencies = [
  "derive_more",
+ "futures",
  "lib-core",
  "modql",
  "serde",
@@ -1962,6 +1967,7 @@ checksum = "41558fa9bb5f4d73952dac0b9d9c2ce23966493fc9ee0008037b01d709838a68"
 dependencies = [
  "inherent",
  "sea-query-derive",
+ "time",
  "uuid",
 ]
 
@@ -1973,6 +1979,7 @@ checksum = "36bbb68df92e820e4d5aeb17b4acd5cc8b5d18b2c36a4dd6f4626aabfa7ab1b9"
 dependencies = [
  "sea-query",
  "sqlx",
+ "time",
  "uuid",
 ]
 
@@ -2287,6 +2294,7 @@ dependencies = [
  "smallvec",
  "sqlformat",
  "thiserror",
+ "time",
  "tokio",
  "tokio-stream",
  "tracing",
@@ -2372,6 +2380,7 @@ dependencies = [
  "sqlx-core",
  "stringprep",
  "thiserror",
+ "time",
  "tracing",
  "uuid",
  "whoami",
@@ -2412,6 +2421,7 @@ dependencies = [
  "sqlx-core",
  "stringprep",
  "thiserror",
+ "time",
  "tracing",
  "uuid",
  "whoami",
@@ -2435,6 +2445,7 @@ dependencies = [
  "percent-encoding",
  "serde",
  "sqlx-core",
+ "time",
  "tracing",
  "url",
  "urlencoding",
@@ -3008,6 +3019,7 @@ dependencies = [
  "serde_with",
  "serial_test",
  "strum_macros",
+ "time",
  "tokio",
  "tower-cookies",
  "tower-http",

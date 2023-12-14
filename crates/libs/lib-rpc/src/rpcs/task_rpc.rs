@@ -9,7 +9,13 @@ use lib_core::{
 use crate::{
 	error::Result,
 	params::{ParamsForCreate, ParamsForUpdate, ParamsIded, ParamsList},
+	router::RpcRouter,
+	rpc_router,
 };
+
+pub fn rpc_router() -> RpcRouter {
+	rpc_router!(create_task, list_tasks, update_task, delete_task)
+}
 
 pub async fn create_task(
 	ctx: Ctx,
